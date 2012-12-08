@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.internal.BaseComputeServiceContextLiveTest;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient.Factory;
 import org.jclouds.sshj.config.SshjSshClientModule;
@@ -61,7 +61,8 @@ public abstract class BaseTerremarkClientLiveTest<S extends TerremarkVCloudClien
    public void setupContext() {
       super.setupContext();
       Injector injector = view.utils().injector();
-      socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 300, 1, TimeUnit.SECONDS);
+      SocketOpen socketOpen = injector.getInstance(SocketOpen.class);
+      socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 300, 1, TimeUnit.SECONDS);
       sshFactory = injector.getInstance(Factory.class);
       connection = (S) RestContext.class.cast(view.unwrap()).getApi();
    }

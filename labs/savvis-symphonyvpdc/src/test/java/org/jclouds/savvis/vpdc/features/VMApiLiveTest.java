@@ -28,8 +28,8 @@ import org.jclouds.cim.OSType;
 import org.jclouds.compute.domain.CIMOperatingSystem;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.domain.LoginCredentials;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.savvis.vpdc.domain.Network;
 import org.jclouds.savvis.vpdc.domain.Resource;
 import org.jclouds.savvis.vpdc.domain.Task;
@@ -66,7 +66,8 @@ public class VMApiLiveTest extends BaseVPDCApiLiveTest {
    public void setupContext() {
       super.setupContext();
       api = restContext.getApi().getVMApi();
-      socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 130, 10, TimeUnit.SECONDS);// make
+      SocketOpen socketOpen = context.utils().injector().getInstance(SocketOpen.class);
+      socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 130, 10, TimeUnit.SECONDS);// make
    }
 
    private String billingSiteId;

@@ -34,8 +34,8 @@ import org.jclouds.joyent.cloudapi.v6_5.domain.Machine;
 import org.jclouds.joyent.cloudapi.v6_5.internal.BaseJoyentCloudApiLiveTest;
 import org.jclouds.joyent.cloudapi.v6_5.options.CreateMachineOptions;
 import org.jclouds.joyent.cloudapi.v6_5.reference.Metadata;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.ssh.SshClient;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.InetAddresses2;
@@ -96,7 +96,8 @@ public class MachineApiLiveTest extends BaseJoyentCloudApiLiveTest {
       cloudApiContext.getApi().getKeyApi().create(Key.builder().name(fingerprint).key(key.get("public")).build());
       api = cloudApiContext.getApi().getMachineApiForDatacenter(
             Iterables.get(cloudApiContext.getApi().getConfiguredDatacenters(), 0));
-      socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 180, 1, 1, TimeUnit.SECONDS);
+      SocketOpen socketOpen = context.utils().injector().getInstance(SocketOpen.class);
+      socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 180, 1, 1, TimeUnit.SECONDS);
       machineRunning = new RetryablePredicate<Machine>(new Predicate<Machine>() {
 
          @Override

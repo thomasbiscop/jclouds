@@ -52,8 +52,8 @@ import org.jclouds.gogrid.options.GetImageListOptions;
 import org.jclouds.gogrid.predicates.LoadBalancerLatestJobCompleted;
 import org.jclouds.gogrid.predicates.ServerLatestJobCompleted;
 import org.jclouds.javax.annotation.Nullable;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
 import org.testng.SkipException;
@@ -344,10 +344,11 @@ public class GoGridLiveTestDisabled extends BaseComputeServiceContextLiveTest {
 
       HostAndPort socket = HostAndPort.fromParts(createdServer.getIp().getIp(), 22);
 
-      RetryablePredicate<HostAndPort> socketOpen = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 180,
+      SocketOpen socketOpen = context.utils().injector().getInstance(SocketOpen.class);
+      RetryablePredicate<HostAndPort> socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 180,
                5, TimeUnit.SECONDS);
 
-      socketOpen.apply(socket);
+      socketTester.apply(socket);
 
       SshClient sshClient = gocontext.utils().injector().getInstance(SshClient.Factory.class).create(socket, instanceCredentials);
       sshClient.connect();

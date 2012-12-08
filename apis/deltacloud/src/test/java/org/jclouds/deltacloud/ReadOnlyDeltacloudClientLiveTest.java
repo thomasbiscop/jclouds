@@ -35,8 +35,8 @@ import org.jclouds.deltacloud.domain.Realm;
 import org.jclouds.deltacloud.domain.Transition;
 import org.jclouds.deltacloud.predicates.InstanceFinished;
 import org.jclouds.deltacloud.predicates.InstanceRunning;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -72,7 +72,8 @@ public class ReadOnlyDeltacloudClientLiveTest extends BaseComputeServiceContextL
    public void setupContext() {
       super.setupContext();
       client = view.unwrap(DeltacloudApiMetadata.CONTEXT_TOKEN).getApi();
-      socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 180, 1, TimeUnit.SECONDS);
+      SocketOpen socketOpen = context.utils().injector().getInstance(SocketOpen.class);
+      socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 180, 1, TimeUnit.SECONDS);
       stateChanges = ImmutableMap.<Instance.State, Predicate<Instance>> of(//
                Instance.State.RUNNING, new RetryablePredicate<Instance>(new InstanceRunning(client), 600, 1,
                         TimeUnit.SECONDS),//

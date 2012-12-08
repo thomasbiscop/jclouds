@@ -27,8 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.jclouds.collect.IterableWithMarker;
-import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
+import org.jclouds.predicates.SocketOpen;
 import org.jclouds.rds.domain.Authorization;
 import org.jclouds.rds.domain.Authorization.Status;
 import org.jclouds.rds.domain.Instance;
@@ -63,8 +63,9 @@ public class InstanceApiLiveTest extends BaseRDSApiLiveTest {
    public void setupContext() {
       super.setupContext();
       securityGroup = createSecurityGroupAndAuthorizeIngressToAll(INSTANCE);
-
-      socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 180, 1, 1, TimeUnit.SECONDS);
+      
+      SocketOpen socketOpen = context.utils().injector().getInstance(SocketOpen.class);
+      socketTester = new RetryablePredicate<HostAndPort>(socketOpen, 180, 1, 1, TimeUnit.SECONDS);
       instanceAvailable = new RetryablePredicate<Instance>(new Predicate<Instance>() {
 
          @Override
