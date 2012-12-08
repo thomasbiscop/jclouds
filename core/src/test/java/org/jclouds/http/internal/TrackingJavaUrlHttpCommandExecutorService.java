@@ -19,6 +19,8 @@
 package org.jclouds.http.internal;
 
 import java.lang.reflect.Method;
+import java.net.Proxy;
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,6 +42,7 @@ import org.jclouds.http.handlers.DelegatingRetryHandler;
 import org.jclouds.io.ContentMetadataCodec;
 import org.jclouds.rest.internal.GeneratedHttpRequest;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
@@ -81,7 +84,6 @@ public class TrackingJavaUrlHttpCommandExecutorService extends JavaUrlHttpComman
       return GeneratedHttpRequest.class.cast(commandInvoked.getCurrentRequest()).getJavaMethod();
    }
 
-   @SuppressWarnings("unchecked")
    public static List<Object> getJavaArgsForRequestAtIndex(final Collection<HttpCommand> commandsInvoked, int index) {
       return GeneratedHttpRequest.class.cast(Iterables.get(commandsInvoked, index).getCurrentRequest()).getArgs();
    }
@@ -91,10 +93,10 @@ public class TrackingJavaUrlHttpCommandExecutorService extends JavaUrlHttpComman
             @Named(Constants.PROPERTY_IO_WORKER_THREADS) ExecutorService ioWorkerExecutor,
             DelegatingRetryHandler retryHandler, IOExceptionRetryHandler ioRetryHandler,
             DelegatingErrorHandler errorHandler, HttpWire wire, @Named("untrusted") HostnameVerifier verifier,
-            @Named("untrusted") Supplier<SSLContext> untrustedSSLContextProvider, List<HttpCommand> commandsInvoked)
-            throws SecurityException, NoSuchFieldException {
+            @Named("untrusted") Supplier<SSLContext> untrustedSSLContextProvider, Function<URI, Proxy> proxyForURI,
+            List<HttpCommand> commandsInvoked) throws SecurityException, NoSuchFieldException {
       super(utils, contentMetadataCodec, ioWorkerExecutor, retryHandler, ioRetryHandler, errorHandler, wire, verifier,
-               untrustedSSLContextProvider);
+               untrustedSSLContextProvider, proxyForURI);
       this.commandsInvoked = commandsInvoked;
    }
 

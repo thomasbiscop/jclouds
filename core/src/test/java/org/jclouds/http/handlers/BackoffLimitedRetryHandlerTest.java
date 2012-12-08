@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.Proxy;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,6 +56,8 @@ import org.jclouds.rest.internal.RestAnnotationProcessor;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Supplier;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -121,6 +124,7 @@ public class BackoffLimitedRetryHandlerTest {
                new DateServiceRfc1123Codec(new SimpleDateFormatDateService()), new DateServiceIso8601Codec(
                         new SimpleDateFormatDateService())));
       RedirectionRetryHandler retry = new RedirectionRetryHandler(uriBuilderProvider, backoff);
+      @SuppressWarnings("unchecked")
       JavaUrlHttpCommandExecutorService httpService = new JavaUrlHttpCommandExecutorService(utils, 
                contentMetadataCodec, execService,
                new DelegatingRetryHandler(backoff, retry), new BackoffLimitedRetryHandler(),
@@ -137,7 +141,7 @@ public class BackoffLimitedRetryHandlerTest {
                      return null;
                   }
 
-               });
+               }, Function.class.cast(Functions.constant(Proxy.NO_PROXY)));
       executorService = new TransformingHttpCommandExecutorServiceImpl(httpService, execService);
    }
 
