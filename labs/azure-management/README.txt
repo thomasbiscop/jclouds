@@ -1,4 +1,4 @@
-How to create the certificate :
+   How to create the certificate :
  
 Create the .cer and pfx files using http://www.windowsazure4j.org/learn/labs/Management/index.html or http://msdn.microsoft.com/en-us/library/gg551722
   
